@@ -28,3 +28,10 @@ Chrome may show a prompt asking to confirm opening OmniFocus due to its custom U
 - Open Terminal on macOS and run:
   ```bash
   defaults write com.google.Chrome URLAllowlist -array-add 'omnifocus://*'
+
+## Using in Brave Browser
+This extension is compatible with Brave Browser, which is based on Chromium and supports Chrome extensions. To use it in Brave:
+
+Follow the same installation steps as for Chrome (see "Installation" above) but us the following in Terminal to fix the Security Prompt
+```bash
+defaults write com.brave.Browser URLAllowlist -array-add 'omnifocus://*'
