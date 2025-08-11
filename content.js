@@ -1,3 +1,4 @@
+// Function to open the OmniFocus URL via hidden iframe
 function openCustomUrl(url) {
   const iframe = document.createElement('iframe');
   iframe.style.display = 'none';
@@ -8,10 +9,11 @@ function openCustomUrl(url) {
   }, 5000);
 }
 
+// Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "openOmniFocusUrl") {
-    console.log("Received message, opening URL:", message.url);
     openCustomUrl(message.url);
     sendResponse({ success: true });
   }
+  return true; // Keep the message channel open for async response
 });
