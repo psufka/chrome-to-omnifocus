@@ -13,7 +13,15 @@ function getSelectionOrTabDetails(tab) {
   return { taskName, taskNote };
 }
 
-// Handle toolbar button click
+// Handle initialization message from popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "initialize") {
+    chrome.action.setPopup({ popup: "" }); // Remove popup after first use
+    sendResponse({ success: true });
+  }
+});
+
+// Handle toolbar button click (now triggered after popup)
 chrome.action.onClicked.addListener((tab) => {
   if (tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('about:')) {
     chrome.scripting.executeScript({

@@ -7,11 +7,11 @@ A Chrome extension by Paul Sufka to save the current tab, selected text, or link
 - Uses OmniFocus's URL scheme (`omnifocus:///add`) to create tasks automatically.
 
 ## Installation
-1. Clone or download all files in this repository and place them into a folder of your choice. (E.g. ~/Documents/chrome-to-omnifocus/)
+1. Clone or download this repository.
 2. Open Chrome and navigate to `chrome://extensions/`.
 3. Enable "Developer mode" (top right).
 4. Click "Load unpacked" and select the folder containing the extension files.
-5. The extension icon should appear in your toolbar. _You may want to pin the icon for easier access._ 
+5. The extension icon should appear in your toolbar. _You may want to pin it for easier access._ 
 6. Before first use, either restart your browser, or reload the tab you want to save.
 
 ## Usage
