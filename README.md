@@ -1,7 +1,5 @@
 # Save to OmniFocus Chrome Extension by Paul Sufka
 
-## Version 1.0.1
-
 A Chrome extension by Paul Sufka to save the current tab, selected text, or link as a task in OmniFocus. Built with Manifest V3 for compatibility with modern Chrome versions.
 
 ## Features
@@ -18,7 +16,7 @@ A Chrome extension by Paul Sufka to save the current tab, selected text, or link
 
 ## Usage
 - Click the toolbar icon to save the current tab or selected text to OmniFocus.
-- You may want to pin the icon to your toolbar for easier access. 
+- You may want to pin the icon to your toolbar for easier access.
 
 **Requirements**: OmniFocus must be installed and **running** on your macOS device.
 
