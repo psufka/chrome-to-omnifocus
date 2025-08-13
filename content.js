@@ -1,12 +1,16 @@
 // Function to open the OmniFocus URL via hidden iframe
 function openCustomUrl(url) {
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = url;
-  document.body.appendChild(iframe);
-  setTimeout(() => {
-    iframe.remove();
-  }, 5000);
+  try {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.documentElement.appendChild(iframe);
+    setTimeout(() => {
+      iframe.remove();
+    }, 5000);
+  } catch (error) {
+    console.error("Iframe creation failed:", error.message);
+  }
 }
 
 // Listen for messages from background script

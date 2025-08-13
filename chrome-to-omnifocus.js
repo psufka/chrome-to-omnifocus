@@ -3,16 +3,6 @@ function createOfUrl(taskName, taskNote) {
   return `omnifocus:///add?name=${encodeURIComponent(taskName)}&note=${encodeURIComponent(taskNote)}`;
 }
 
-// Function to get selection or tab details (injected into tab context)
-function getSelectionOrTabDetails(tab) {
-  let taskName = tab.title;
-  let taskNote = tab.url;
-  if (window.getSelection && window.getSelection().toString()) {
-    taskName = window.getSelection().toString();
-  }
-  return { taskName, taskNote };
-}
-
 // Handle initialization message from popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "initialize") {
@@ -21,16 +11,28 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-// Handle toolbar button click (now triggered after popup)
+// Handle toolbar button click
 chrome.action.onClicked.addListener((tab) => {
-  if (tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('about:')) {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: getSelectionOrTabDetails,
-      args: [tab]
-    }).then((results) => {
-      const { taskName, taskNote } = results[0].result;
-      const ofUrl = createOfUrl(taskName, taskNote);
+  if (tab && tab.url) {
+    const taskName = tab.title;
+    const taskNote = tab.url;
+    const ofUrl = createOfUrl(taskName, taskNote);
+    if (tab.url.startsWith('chrome://') || tab.url.startsWith('about:')) {
+      // Open in a new tab and focus it for restricted pages to trigger OmniFocus prompt
+      chrome.tabs.create({ url: ofUrl, active: true }, (newTab) => {
+        setTimeout(() => {
+          // Attempt to remove the tab; ignore if already closed by OmniFocus
+          try {
+            chrome.tabs.get(newTab.id, (tab) => {
+              chrome.tabs.remove(newTab.id);
+            });
+          } catch (error) {
+            // Silently ignore "No tab with id" error, as it’s expected if OmniFocus closed it
+          }
+        }, 10000); // 10 seconds to allow OmniFocus to process
+      });
+    } else {
+      // Use content script for non-restricted pages
       chrome.tabs.sendMessage(tab.id, { action: "openOmniFocusUrl", url: ofUrl }, (response) => {
         if (chrome.runtime.lastError) {
           console.error("Message failed:", chrome.runtime.lastError.message);
@@ -38,8 +40,8 @@ chrome.action.onClicked.addListener((tab) => {
           console.error("No success response from content script");
         }
       });
-    }).catch((error) => {
-      console.error("Script execution failed:", error.message);
-    });
+    }
+  } else {
+    console.error("Tab or tab.url is undefined");
   }
 });
