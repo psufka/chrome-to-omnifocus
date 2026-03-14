@@ -1,31 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Chrome to OmniFocus by Paul Sufka",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A Chrome extension by Paul Sufka to save the current tab or selected text as a task in OmniFocus.",
   "permissions": [
     "activeTab",
     "scripting",
-    "tabs"
-  ],
-  "host_permissions": [
-    "<all_urls>"
+    "storage"
   ],
   "background": {
     "service_worker": "chrome-to-omnifocus.js"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_end"
-    }
-  ],
   "action": {
     "default_icon": {
       "128": "icon128.png"
     },
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_title": "Save to OmniFocus"
   },
   "icons": {
     "128": "icon128.png"
