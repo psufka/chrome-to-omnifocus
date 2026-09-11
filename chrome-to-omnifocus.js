@@ -38,6 +38,12 @@ chrome.action.onClicked.addListener(async (tab) => {
     await chrome.tabs.update(tab.id, { url: createOfUrl(taskName, tab.url) });
     // A completed API call only means the launch was requested. Chrome doesn't
     // report whether the user accepted its dialog or OmniFocus saved the task.
+    // A visible arrow acknowledges the click without claiming verified delivery.
+    await chrome.action.setBadgeBackgroundColor({ color: "#2563eb" });
+    await chrome.action.setBadgeText({ text: "→" });
+    await chrome.action.setTitle({
+      title: `OmniFocus requested: ${taskName}. Check your OmniFocus Inbox.`
+    });
   } catch (error) {
     await showError(error.message || "Could not open OmniFocus");
   }
