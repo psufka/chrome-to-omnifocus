@@ -54,16 +54,11 @@ For a live smoke test after reloading:
 4. Try selected text, then a `chrome://` page; check task names and URL notes in Quick Entry.
 5. Confirm each source tab stays open and no extra tab remains. Cancel test drafts or delete any disposable tasks saved during testing.
 
-## Versions
+## Version history
 
-- **1.2.3**: Removes the blue launch indicator; Quick Entry provides the visible response.
-- **1.2.2**: Restores OmniFocus Quick Entry for review and saving, while retaining the extension-origin launch that avoids per-website Chrome permission prompts.
-- **1.2.1**: Visible toolbar feedback for silent captures. Live-tested on macOS with normal pages, selected text from different domains, and Chrome internal pages; verified the resulting Inbox tasks.
-- **1.2.0**: Extension-origin launch to reduce repeated prompts, direct Inbox saving, no setup popup or storage permission, no temporary-tab cleanup, improved fallback titles and error feedback, regression tests.
-- **1.1.0**: Selected text support, persistent initialization, on-demand script injection, error badge.
-- **1.0.2**: Tab removal fixes and Chrome internal page support.
-- **1.0.1**: First-time setup popup.
-- **1.0.0**: Initial release.
+Current version: **1.2.3** — opens OmniFocus Quick Entry, retains the shared Chrome approval, and has no blue launch indicator.
+
+See [CHANGELOG.md](CHANGELOG.md) for the complete version history.
 
 ## License
 
