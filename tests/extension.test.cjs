@@ -54,7 +54,7 @@ test('toolbar opens Quick Entry from the extension without autosaving or replaci
   assert.equal(params.get('name'), tab.title);
   assert.equal(params.get('note'), tab.url);
   assert.equal(calls.scripts.length, 1);
-  assert.equal(calls.badges.at(-1), '→');
+  assert.equal(calls.badges.at(-1), '');
 });
 
 test('selected text survives URL encoding, including parameter-like text and Unicode', async () => {
@@ -78,7 +78,7 @@ for (const url of ['chrome://extensions/', 'about:blank', 'https://chromewebstor
     const { click, calls } = harness({ injectionError: 'Cannot access contents of this page' });
     await click({ ...tab, url });
     assert.equal(quickEntryParams(calls).get('note'), url);
-    assert.equal(calls.badges.at(-1), '→');
+    assert.equal(calls.badges.at(-1), '');
   });
 }
 

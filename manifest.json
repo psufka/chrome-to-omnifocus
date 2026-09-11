@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Chrome to OmniFocus by Paul Sufka",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Send the current tab or selected text to OmniFocus Quick Entry, ready to review and save.",
   "permissions": [
     "activeTab",

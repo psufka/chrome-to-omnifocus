@@ -36,14 +36,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     // remember one approval for all sites, and the external protocol leaves
     // the current page in place. No iframe, temporary tab, or cleanup timer.
     await chrome.tabs.update(tab.id, { url: createOfUrl(taskName, tab.url) });
-    // A completed API call only means the launch was requested. Chrome doesn't
-    // report whether the user accepted its dialog or OmniFocus saved the task.
-    // A visible arrow acknowledges the click without claiming verified delivery.
-    await chrome.action.setBadgeBackgroundColor({ color: "#2563eb" });
-    await chrome.action.setBadgeText({ text: "→" });
-    await chrome.action.setTitle({
-      title: `Quick Entry requested: ${taskName}. Review and save in OmniFocus.`
-    });
+
   } catch (error) {
     await showError(error.message || "Could not open OmniFocus");
   }
