@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Chrome to OmniFocus by Paul Sufka",
-  "version": "1.2.1",
-  "description": "A Chrome extension by Paul Sufka to save the current tab or selected text as a task in OmniFocus.",
+  "version": "1.2.2",
+  "description": "Send the current tab or selected text to OmniFocus Quick Entry, ready to review and save.",
   "permissions": [
     "activeTab",
     "scripting"
@@ -17,7 +17,7 @@
       "48": "icon48.png",
       "128": "icon128.png"
     },
-    "default_title": "Save to OmniFocus"
+    "default_title": "Send to OmniFocus Quick Entry"
   },
   "icons": {
     "16": "icon16.png",

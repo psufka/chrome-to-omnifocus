@@ -1,15 +1,15 @@
 # Chrome to OmniFocus
 
-A Chrome extension by Paul Sufka that saves the current tab or selected text directly to your OmniFocus Inbox.
+A Chrome extension by Paul Sufka that sends the current tab or selected text to OmniFocus Quick Entry, ready to review and save.
 
 ## Features
 
-- Click the toolbar button to save a task immediately, without a setup popup or OmniFocus Quick Entry confirmation.
+- Click the toolbar button to open OmniFocus Quick Entry with the task filled in. Edit it, choose a project or tags, then save when ready.
 - Selected text becomes the task name; otherwise, the page title is used. The full page URL becomes the note.
 - Chrome's external-app permission belongs to the extension, so one remembered approval covers different websites.
 - Browser-internal pages, PDFs, and pages that prohibit selection access fall back to the title and URL.
 - Your current page stays open. No temporary tabs or delayed tab-closing timers.
-- A blue `→` badge acknowledges each launch request; check your OmniFocus Inbox for the task. Saves happen without opening Quick Entry, so OmniFocus may stay in the background.
+- A blue `→` badge acknowledges the Quick Entry request. The task is not saved until you save it in OmniFocus.
 - A red `!` badge indicates an API error; hover over the toolbar button for details. The next click clears the error.
 
 ## Install or update
@@ -27,9 +27,9 @@ On the first save, Chrome may show **Open OmniFocus?**. Check **Always allow …
 
 That approval should cover subsequent saves from any website in the same Chrome profile. The old website-specific approvals do not transfer, so upgrading from 1.1.0 can require one new approval. Moving an unpacked extension to another folder can change its ID and require approval again.
 
-Chrome owns this dialog. The extension cannot check the box or suppress it itself. Browser policies, clearing permissions, different profiles, or other Chromium browsers may affect whether approval is remembered. If the prompt still names the website, confirm that version **1.2.1** is loaded and reload the extension.
+Chrome owns this dialog. The extension cannot check the box or suppress it itself. Browser policies, clearing permissions, different profiles, or other Chromium browsers may affect whether approval is remembered. If the prompt still names the website, confirm that version **1.2.2** is loaded and reload the extension.
 
-Tasks use OmniFocus's `autosave=true` option to skip Quick Entry. Chrome does not tell the extension whether the external-app dialog was accepted or whether OmniFocus saved the task, so the blue arrow indicates a launch request, not verified task delivery. It remains until the next click, and hovering shows which task was requested. If you cancel the dialog, no task is sent; click the toolbar button again when ready.
+Tasks open in OmniFocus Quick Entry for review; automatic saving is disabled. This is separate from Chrome's permission to launch OmniFocus. Chrome does not tell the extension whether its external-app dialog was accepted or whether you saved the task in OmniFocus, so the blue arrow indicates a launch request, not a saved task. It remains until the next click, and hovering shows which task was requested. If you cancel the dialog, no task is sent; click the toolbar button again when ready.
 
 ## Privacy and permissions
 
@@ -45,18 +45,19 @@ No build step or npm dependencies are required. With Node.js 18 or newer:
 npm test
 ```
 
-The regression tests cover selection and URL encoding, direct-save parameters, restricted-page fallback, invalid tabs, API errors, and the absence of a setup popup. They mock Chrome's APIs; they cannot verify Chrome's external-app dialog or OmniFocus's actual task creation.
+The regression tests cover selection and URL encoding, Quick Entry without autosave, restricted-page fallback, invalid tabs, API errors, and the absence of a setup popup. They mock Chrome's APIs; they cannot verify Chrome's external-app dialog or OmniFocus's actual task creation.
 
 For a live smoke test after reloading:
 
-1. Save a disposable page and remember the extension's approval if prompted.
-2. Confirm exactly one task appears in the OmniFocus Inbox without Quick Entry.
-3. Save a page on another domain and confirm Chrome does not prompt again.
-4. Save selected text, then a `chrome://` page; check task names and URL notes.
-5. Confirm each source tab stays open and no extra tab remains. Delete the disposable tasks afterward.
+1. Click the extension on a disposable page and remember Chrome's extension approval if prompted.
+2. Confirm OmniFocus Quick Entry opens with the page title and URL. Cancel the test draft, or save and verify the task in the Inbox.
+3. Repeat on another domain and confirm Quick Entry still opens without another Chrome permission prompt.
+4. Try selected text, then a `chrome://` page; check task names and URL notes in Quick Entry.
+5. Confirm each source tab stays open and no extra tab remains. Cancel test drafts or delete any disposable tasks saved during testing.
 
 ## Versions
 
+- **1.2.2**: Restores OmniFocus Quick Entry for review and saving, while retaining the extension-origin launch that avoids per-website Chrome permission prompts.
 - **1.2.1**: Visible toolbar feedback for silent captures. Live-tested on macOS with normal pages, selected text from different domains, and Chrome internal pages; verified the resulting Inbox tasks.
 - **1.2.0**: Extension-origin launch to reduce repeated prompts, direct Inbox saving, no setup popup or storage permission, no temporary-tab cleanup, improved fallback titles and error feedback, regression tests.
 - **1.1.0**: Selected text support, persistent initialization, on-demand script injection, error badge.

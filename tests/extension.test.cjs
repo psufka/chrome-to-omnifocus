@@ -37,19 +37,19 @@ function harness({ selection = '', injectionError, updateError } = {}) {
 
 const tab = { id: 12, title: 'An example page', url: 'https://example.com/a?x=1&y=2#section' };
 
-function savedParams(calls) {
+function quickEntryParams(calls) {
   assert.equal(calls.updates.length, 1);
   const url = new URL(calls.updates[0].url);
   assert.equal(url.protocol, 'omnifocus:');
   assert.equal(url.pathname, '/add');
-  assert.equal(url.searchParams.get('autosave'), 'true');
+  assert.equal(url.searchParams.has('autosave'), false, 'Quick Entry must not autosave');
   return url.searchParams;
 }
 
-test('toolbar sends an autosaving task from the extension, preserving the source tab', async () => {
+test('toolbar opens Quick Entry from the extension without autosaving or replacing the source tab', async () => {
   const { click, calls } = harness();
   await click(tab);
-  const params = savedParams(calls);
+  const params = quickEntryParams(calls);
   assert.equal(calls.updates[0].id, tab.id);
   assert.equal(params.get('name'), tab.title);
   assert.equal(params.get('note'), tab.url);
@@ -61,7 +61,7 @@ test('selected text survives URL encoding, including parameter-like text and Uni
   const title = 'Read café ☕ &flag=true #1 / 100% + "quotes"\nnext line';
   const { click, calls } = harness({ selection: `  ${title}  ` });
   await click(tab);
-  const params = savedParams(calls);
+  const params = quickEntryParams(calls);
   assert.equal(params.get('name'), title);
   assert.equal(params.has('flag'), false);
   assert.equal(params.get('note'), tab.url);
@@ -70,14 +70,14 @@ test('selected text survives URL encoding, including parameter-like text and Uni
 test('whitespace selection falls back to the title', async () => {
   const { click, calls } = harness({ selection: ' \n\t ' });
   await click(tab);
-  assert.equal(savedParams(calls).get('name'), tab.title);
+  assert.equal(quickEntryParams(calls).get('name'), tab.title);
 });
 
 for (const url of ['chrome://extensions/', 'about:blank', 'https://chromewebstore.google.com/', 'file:///tmp/report.pdf']) {
-  test(`injection denial still saves ${url}`, async () => {
+  test(`injection denial still opens Quick Entry for ${url}`, async () => {
     const { click, calls } = harness({ injectionError: 'Cannot access contents of this page' });
     await click({ ...tab, url });
-    assert.equal(savedParams(calls).get('note'), url);
+    assert.equal(quickEntryParams(calls).get('note'), url);
     assert.equal(calls.badges.at(-1), '→');
   });
 }
@@ -86,7 +86,7 @@ test('a missing or blank title falls back to the URL', async () => {
   for (const title of [undefined, '   ']) {
     const { click, calls } = harness();
     await click({ ...tab, title });
-    assert.equal(savedParams(calls).get('name'), tab.url);
+    assert.equal(quickEntryParams(calls).get('name'), tab.url);
   }
 });
 

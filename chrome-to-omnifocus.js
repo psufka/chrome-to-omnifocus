@@ -1,7 +1,7 @@
-const DEFAULT_TITLE = "Save to OmniFocus";
+const DEFAULT_TITLE = "Send to OmniFocus Quick Entry";
 
 function createOfUrl(taskName, taskNote) {
-  return `omnifocus:///add?name=${encodeURIComponent(taskName)}&note=${encodeURIComponent(taskNote)}&autosave=true`;
+  return `omnifocus:///add?name=${encodeURIComponent(taskName)}&note=${encodeURIComponent(taskNote)}`;
 }
 
 // Read only the selection. Launching an iframe inside the page would make
@@ -42,7 +42,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     await chrome.action.setBadgeBackgroundColor({ color: "#2563eb" });
     await chrome.action.setBadgeText({ text: "→" });
     await chrome.action.setTitle({
-      title: `OmniFocus requested: ${taskName}. Check your OmniFocus Inbox.`
+      title: `Quick Entry requested: ${taskName}. Review and save in OmniFocus.`
     });
   } catch (error) {
     await showError(error.message || "Could not open OmniFocus");
