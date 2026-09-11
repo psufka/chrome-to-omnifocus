@@ -1,93 +1,53 @@
-// Helper function to create the OmniFocus URL
+const DEFAULT_TITLE = "Save to OmniFocus";
+
 function createOfUrl(taskName, taskNote) {
-  return `omnifocus:///add?name=${encodeURIComponent(taskName)}&note=${encodeURIComponent(taskNote)}`;
+  return `omnifocus:///add?name=${encodeURIComponent(taskName)}&note=${encodeURIComponent(taskNote)}&autosave=true`;
 }
 
-// On startup, restore initialized state so popup doesn't reappear after browser restart
-chrome.storage.local.get("initialized", (data) => {
-  if (data.initialized) {
-    chrome.action.setPopup({ popup: "" });
-  }
-});
+// Read only the selection. Launching an iframe inside the page would make
+// Chrome ask for permission separately for every website's origin.
+function readSelection() {
+  return window.getSelection()?.toString().trim() || "";
+}
 
-// Handle initialization message from popup
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "initialize") {
-    chrome.action.setPopup({ popup: "" });
-    chrome.storage.local.set({ initialized: true });
-    sendResponse({ success: true });
-  }
-});
-
-// Handle toolbar button click
 chrome.action.onClicked.addListener(async (tab) => {
-  if (!tab || !tab.url) {
-    showError("Cannot access this tab");
-    return;
-  }
-
-  const isRestricted = tab.url.startsWith("chrome://") || tab.url.startsWith("about:");
-
-  if (isRestricted) {
-    // Can't inject scripts into restricted pages — open OF URL in a new tab
-    const ofUrl = createOfUrl(tab.title, tab.url);
-    chrome.tabs.create({ url: ofUrl, active: true }, (newTab) => {
-      setTimeout(() => {
-        chrome.tabs.get(newTab.id, () => {
-          if (chrome.runtime.lastError) return; // Tab already closed — expected
-          chrome.tabs.remove(newTab.id);
-        });
-      }, 10000);
-    });
-    return;
-  }
-
-  // Get selected text from the page (if any)
-  let selectedText = "";
   try {
-    const results = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: () => window.getSelection().toString()
-    });
-    selectedText = results[0]?.result || "";
-  } catch (e) {
-    // Script injection failed (e.g., PDF, web store) — fall back to title only
-  }
+    await chrome.action.setBadgeText({ text: "" });
+    await chrome.action.setTitle({ title: DEFAULT_TITLE });
 
-  const taskName = selectedText || tab.title;
-  const taskNote = tab.url;
-  const ofUrl = createOfUrl(taskName, taskNote);
+    if (!Number.isInteger(tab?.id) || tab.id < 0 || !tab.url) {
+      throw new Error("Cannot access this tab");
+    }
 
-  // Inject iframe to trigger omnifocus:// URL scheme
-  try {
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: (url) => {
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.src = url;
-        document.documentElement.appendChild(iframe);
-        setTimeout(() => iframe.remove(), 5000);
-      },
-      args: [ofUrl]
-    });
-  } catch (e) {
-    // Injection failed — fall back to tab-based approach
-    chrome.tabs.create({ url: ofUrl, active: true }, (newTab) => {
-      setTimeout(() => {
-        chrome.tabs.get(newTab.id, () => {
-          if (chrome.runtime.lastError) return;
-          chrome.tabs.remove(newTab.id);
-        });
-      }, 10000);
-    });
+    let selectedText = "";
+    try {
+      const results = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: readSelection
+      });
+      selectedText = results[0]?.result?.trim() || "";
+    } catch {
+      // PDFs, the Web Store, and browser-internal pages may prohibit injection.
+      // They can still be saved using their title and URL.
+    }
+
+    const taskName = selectedText || tab.title?.trim() || tab.url;
+    // tabs.update attributes the launch to this extension's origin. Chrome can
+    // remember one approval for all sites, and the external protocol leaves
+    // the current page in place. No iframe, temporary tab, or cleanup timer.
+    await chrome.tabs.update(tab.id, { url: createOfUrl(taskName, tab.url) });
+    // A completed API call only means the launch was requested. Chrome doesn't
+    // report whether the user accepted its dialog or OmniFocus saved the task.
+  } catch (error) {
+    await showError(error.message || "Could not open OmniFocus");
   }
 });
 
-// Show a brief error badge on the toolbar icon
-function showError(msg) {
-  console.error("Chrome to OmniFocus:", msg);
-  chrome.action.setBadgeText({ text: "!" });
-  chrome.action.setBadgeBackgroundColor({ color: "#e74c3c" });
-  setTimeout(() => chrome.action.setBadgeText({ text: "" }), 3000);
+async function showError(message) {
+  console.error("Chrome to OmniFocus:", message);
+  // Keep the message available until the next click: service-worker timers
+  // aren't reliable, and a disappearing badge is easy to miss.
+  await chrome.action.setBadgeBackgroundColor({ color: "#e74c3c" });
+  await chrome.action.setBadgeText({ text: "!" });
+  await chrome.action.setTitle({ title: `${DEFAULT_TITLE}: ${message}` });
 }

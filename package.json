@@ -1,0 +1,11 @@
+{
+  "name": "chrome-to-omnifocus",
+  "version": "1.2.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
